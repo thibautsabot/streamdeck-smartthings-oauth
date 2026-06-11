@@ -71,22 +71,29 @@
             font-size: 18px;
             color: #2d3748;
             word-break: break-all;
-            user-select: all;
             padding: 12px;
             background: white;
             border-radius: 6px;
-            border: 1px solid #e2e8f0;
-            cursor: pointer;
-            transition: background 0.2s;
+            border: 2px solid #e2e8f0;
+            cursor: text;
+            transition: border-color 0.2s;
+            width: 100%;
+            box-sizing: border-box;
+            outline: none;
         }
 
         .code:hover {
-            background: #f7fafc;
             border-color: #667eea;
         }
 
-        .code:active {
-            background: #edf2f7;
+        .code:focus {
+            border-color: #667eea;
+            background: #f7fafc;
+        }
+
+        .code::selection {
+            background: #667eea;
+            color: white;
         }
 
         .copy-btn {
@@ -172,7 +179,7 @@
         <div id="success-container" style="display: none;">
             <div class="code-container">
                 <div class="code-label">Authorization Code</div>
-                <div class="code" id="code-display"></div>
+                <input type="text" readonly class="code" id="code-display" />
             </div>
 
             <button class="copy-btn" id="copy-btn">
@@ -211,24 +218,22 @@
 
         function displaySuccess(code) {
             document.getElementById('success-container').style.display = 'block';
-            const codeDisplay = document.getElementById('code-display');
-            codeDisplay.textContent = code;
+            const codeInput = document.getElementById('code-display');
+            codeInput.value = code;
 
-            // Make code clickable to select all
-            codeDisplay.addEventListener('click', () => {
-                const range = document.createRange();
-                range.selectNodeContents(codeDisplay);
-                const selection = window.getSelection();
-                selection.removeAllRanges();
-                selection.addRange(range);
-            });
-
-            // Setup copy button with fallback for popups
+            // Setup copy button - use input.select() which works reliably in popups
             const copyBtn = document.getElementById('copy-btn');
             copyBtn.addEventListener('click', () => {
-                // Try modern clipboard API first
-                if (navigator.clipboard && navigator.clipboard.writeText) {
-                    navigator.clipboard.writeText(code).then(() => {
+                try {
+                    // Focus and select the input
+                    codeInput.focus();
+                    codeInput.select();
+                    codeInput.setSelectionRange(0, 99999); // For mobile
+
+                    // Try to copy using execCommand (most reliable in popups)
+                    const successful = document.execCommand('copy');
+
+                    if (successful) {
                         copyBtn.textContent = '✓ Copied!';
                         copyBtn.classList.add('copied');
 
@@ -236,50 +241,29 @@
                             copyBtn.textContent = '📋 Copy Code';
                             copyBtn.classList.remove('copied');
                         }, 2000);
-                    }).catch(err => {
-                        console.warn('Clipboard API failed, using fallback:', err);
-                        fallbackCopy(code, copyBtn);
-                    });
-                } else {
-                    // Use fallback for browsers/contexts without clipboard API
-                    fallbackCopy(code, copyBtn);
+                    } else {
+                        // If execCommand fails, leave it selected so user can Ctrl+C
+                        copyBtn.textContent = '⚠️ Press Ctrl+C / Cmd+C';
+                        setTimeout(() => {
+                            copyBtn.textContent = '📋 Copy Code';
+                        }, 3000);
+                    }
+                } catch (err) {
+                    console.error('Copy failed:', err);
+                    // Leave the input selected so user can manually copy
+                    codeInput.focus();
+                    codeInput.select();
+                    copyBtn.textContent = '⚠️ Press Ctrl+C / Cmd+C';
+                    setTimeout(() => {
+                        copyBtn.textContent = '📋 Copy Code';
+                    }, 3000);
                 }
             });
-        }
 
-        function fallbackCopy(text, button) {
-            // Create a temporary textarea
-            const textarea = document.createElement('textarea');
-            textarea.value = text;
-            textarea.style.position = 'fixed';
-            textarea.style.top = '0';
-            textarea.style.left = '-9999px';
-            textarea.setAttribute('readonly', '');
-            document.body.appendChild(textarea);
-
-            // Select and copy
-            textarea.select();
-            textarea.setSelectionRange(0, 99999); // For mobile
-
-            try {
-                const successful = document.execCommand('copy');
-                if (successful) {
-                    button.textContent = '✓ Copied!';
-                    button.classList.add('copied');
-
-                    setTimeout(() => {
-                        button.textContent = '📋 Copy Code';
-                        button.classList.remove('copied');
-                    }, 2000);
-                } else {
-                    alert('Failed to copy. Please select the code above and copy manually (Ctrl+C or Cmd+C).');
-                }
-            } catch (err) {
-                console.error('Fallback copy failed:', err);
-                alert('Failed to copy. Please select the code above and copy manually (Ctrl+C or Cmd+C).');
-            } finally {
-                document.body.removeChild(textarea);
-            }
+            // Also make the input itself clickable to select all
+            codeInput.addEventListener('click', () => {
+                codeInput.select();
+            });
         }
 
         // Parse URL parameters

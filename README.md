@@ -2,43 +2,68 @@
 
 This is a simple static page that handles the OAuth2 redirect callback for the Stream Deck SmartThings plugin.
 
+**Repository**: https://github.mpi-internal.com/thibaut-sabot/streamdeck-smartthings-oauth  
+**Live Demo**: https://streamdeck-smartthings-oauth.vercel.app
+
+[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https://github.mpi-internal.com/thibaut-sabot/streamdeck-smartthings-oauth)
+
 ## Deployment Instructions
 
-### Option 1: Deploy to Vercel (Recommended)
+### Option 1: One-Click Deploy (Easiest)
 
-1. Install Vercel CLI:
+1. Click the "Deploy with Vercel" button above
+2. Sign in to Vercel (or create a free account)
+3. Click "Deploy"
+4. Wait for deployment to complete
+5. Copy your production URL (e.g., `https://your-app.vercel.app`)
+6. Follow the "After Deployment" steps below
+
+### Option 2: Deploy via Vercel CLI (Recommended)
+
+1. Clone or navigate to this repository:
+   ```bash
+   cd ~/Projects/streamdeck-smartthings-oauth
+   ```
+
+2. Install Vercel CLI (if not already installed):
    ```bash
    npm install -g vercel
    ```
 
-2. Deploy:
+3. Deploy:
    ```bash
-   cd /tmp/vercel-oauth-deployment
    vercel --prod
    ```
 
-3. Copy the production URL (e.g., `https://your-app.vercel.app`)
+4. Copy the production URL and follow "After Deployment" steps below
 
-4. Update the redirect URI in your plugin code:
-   - Edit `src/utils/oauth-client.ts`
-   - Replace the `redirectUri` with: `https://your-app.vercel.app/oauth-callback.html`
+### Option 3: GitHub + Vercel Auto-Deploy (Best for CI/CD)
 
-5. **IMPORTANT**: Add this redirect URI to your SmartThings Developer Workspace:
-   - Go to https://smartthings.developer.samsung.com/workspace/projects
-   - Select your project
-   - Go to "Register App" → "OAuth Client"
-   - Add `https://your-app.vercel.app/oauth-callback.html` to the list of Redirect URIs
-   - Save changes
+1. Go to [vercel.com/new](https://vercel.com/new)
+2. Import the GitHub repository: `thibaut-sabot/streamdeck-smartthings-oauth`
+3. Click "Deploy"
+4. Vercel will auto-deploy on every push to main branch
+5. Follow "After Deployment" steps below
 
-### Option 2: GitHub + Vercel Auto-Deploy
+### After Deployment
 
-1. Create a new GitHub repository
-2. Push this folder to the repository
-3. Connect the repository to Vercel at https://vercel.com/new
-4. Vercel will auto-deploy on every push
-5. Follow steps 3-5 from Option 1
+**Update plugin code** (if you deployed to a different URL than the default):
+```bash
+cd ~/Projects/streamdeck-plugin-smartthings
+# Edit src/utils/oauth-client.ts and update the redirectUri
+npm run build
+```
 
-### Option 3: Other Static Hosts
+**⚠️ CRITICAL - Add redirect URI to SmartThings Developer Workspace**:
+1. Go to https://smartthings.developer.samsung.com/workspace/projects
+2. Select your project
+3. Go to "Register App" → "OAuth Client"
+4. Add your callback URL to "Redirect URIs":
+   - Default: `https://streamdeck-smartthings-oauth.vercel.app/oauth-callback.html`
+   - Or your custom URL: `https://your-app.vercel.app/oauth-callback.html`
+5. Click "Save"
+
+### Option 4: Other Static Hosts
 
 You can also host this on:
 - Netlify

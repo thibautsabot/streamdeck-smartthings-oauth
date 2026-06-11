@@ -76,6 +76,17 @@
             background: white;
             border-radius: 6px;
             border: 1px solid #e2e8f0;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .code:hover {
+            background: #f7fafc;
+            border-color: #667eea;
+        }
+
+        .code:active {
+            background: #edf2f7;
         }
 
         .copy-btn {
@@ -200,24 +211,75 @@
 
         function displaySuccess(code) {
             document.getElementById('success-container').style.display = 'block';
-            document.getElementById('code-display').textContent = code;
+            const codeDisplay = document.getElementById('code-display');
+            codeDisplay.textContent = code;
 
-            // Setup copy button
+            // Make code clickable to select all
+            codeDisplay.addEventListener('click', () => {
+                const range = document.createRange();
+                range.selectNodeContents(codeDisplay);
+                const selection = window.getSelection();
+                selection.removeAllRanges();
+                selection.addRange(range);
+            });
+
+            // Setup copy button with fallback for popups
             const copyBtn = document.getElementById('copy-btn');
             copyBtn.addEventListener('click', () => {
-                navigator.clipboard.writeText(code).then(() => {
-                    copyBtn.textContent = '✓ Copied!';
-                    copyBtn.classList.add('copied');
+                // Try modern clipboard API first
+                if (navigator.clipboard && navigator.clipboard.writeText) {
+                    navigator.clipboard.writeText(code).then(() => {
+                        copyBtn.textContent = '✓ Copied!';
+                        copyBtn.classList.add('copied');
+
+                        setTimeout(() => {
+                            copyBtn.textContent = '📋 Copy Code';
+                            copyBtn.classList.remove('copied');
+                        }, 2000);
+                    }).catch(err => {
+                        console.warn('Clipboard API failed, using fallback:', err);
+                        fallbackCopy(code, copyBtn);
+                    });
+                } else {
+                    // Use fallback for browsers/contexts without clipboard API
+                    fallbackCopy(code, copyBtn);
+                }
+            });
+        }
+
+        function fallbackCopy(text, button) {
+            // Create a temporary textarea
+            const textarea = document.createElement('textarea');
+            textarea.value = text;
+            textarea.style.position = 'fixed';
+            textarea.style.top = '0';
+            textarea.style.left = '-9999px';
+            textarea.setAttribute('readonly', '');
+            document.body.appendChild(textarea);
+
+            // Select and copy
+            textarea.select();
+            textarea.setSelectionRange(0, 99999); // For mobile
+
+            try {
+                const successful = document.execCommand('copy');
+                if (successful) {
+                    button.textContent = '✓ Copied!';
+                    button.classList.add('copied');
 
                     setTimeout(() => {
-                        copyBtn.textContent = '📋 Copy Code';
-                        copyBtn.classList.remove('copied');
+                        button.textContent = '📋 Copy Code';
+                        button.classList.remove('copied');
                     }, 2000);
-                }).catch(err => {
-                    alert('Failed to copy. Please select and copy manually.');
-                    console.error('Copy failed:', err);
-                });
-            });
+                } else {
+                    alert('Failed to copy. Please select the code above and copy manually (Ctrl+C or Cmd+C).');
+                }
+            } catch (err) {
+                console.error('Fallback copy failed:', err);
+                alert('Failed to copy. Please select the code above and copy manually (Ctrl+C or Cmd+C).');
+            } finally {
+                document.body.removeChild(textarea);
+            }
         }
 
         // Parse URL parameters

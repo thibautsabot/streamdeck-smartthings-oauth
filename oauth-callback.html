@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SmartThings OAuth - Stream Deck Plugin</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .container {
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            max-width: 600px;
+            width: 100%;
+            padding: 40px;
+            text-align: center;
+        }
+
+        .icon {
+            font-size: 64px;
+            margin-bottom: 20px;
+        }
+
+        h1 {
+            color: #2d3748;
+            font-size: 28px;
+            margin-bottom: 12px;
+        }
+
+        .subtitle {
+            color: #718096;
+            font-size: 16px;
+            margin-bottom: 32px;
+        }
+
+        .code-container {
+            background: #f7fafc;
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 24px;
+            position: relative;
+        }
+
+        .code-label {
+            font-size: 12px;
+            color: #718096;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 8px;
+            font-weight: 600;
+        }
+
+        .code {
+            font-family: 'Monaco', 'Courier New', monospace;
+            font-size: 18px;
+            color: #2d3748;
+            word-break: break-all;
+            user-select: all;
+            padding: 12px;
+            background: white;
+            border-radius: 6px;
+            border: 1px solid #e2e8f0;
+        }
+
+        .copy-btn {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 14px 32px;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            width: 100%;
+            margin-bottom: 16px;
+        }
+
+        .copy-btn:hover {
+            background: #5568d3;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+        }
+
+        .copy-btn:active {
+            transform: translateY(0);
+        }
+
+        .copy-btn.copied {
+            background: #48bb78;
+        }
+
+        .instructions {
+            background: #edf2f7;
+            border-radius: 8px;
+            padding: 20px;
+            text-align: left;
+            margin-top: 24px;
+        }
+
+        .instructions h3 {
+            color: #2d3748;
+            font-size: 14px;
+            margin-bottom: 12px;
+            font-weight: 600;
+        }
+
+        .instructions ol {
+            padding-left: 20px;
+            color: #4a5568;
+            font-size: 14px;
+            line-height: 1.6;
+        }
+
+        .instructions li {
+            margin-bottom: 8px;
+        }
+
+        .error {
+            background: #fff5f5;
+            border: 2px solid #fc8181;
+            color: #c53030;
+            padding: 16px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+
+        .footer {
+            margin-top: 32px;
+            padding-top: 24px;
+            border-top: 1px solid #e2e8f0;
+            color: #a0aec0;
+            font-size: 13px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="icon" id="icon">🔐</div>
+        <h1 id="title">Authorization Successful!</h1>
+        <p class="subtitle" id="subtitle">Copy the code below and paste it into Stream Deck</p>
+
+        <div id="error-container"></div>
+
+        <div id="success-container" style="display: none;">
+            <div class="code-container">
+                <div class="code-label">Authorization Code</div>
+                <div class="code" id="code-display"></div>
+            </div>
+
+            <button class="copy-btn" id="copy-btn">
+                📋 Copy Code
+            </button>
+
+            <div class="instructions">
+                <h3>📝 Next Steps:</h3>
+                <ol>
+                    <li>Click "Copy Code" above (or manually select and copy)</li>
+                    <li>Return to Stream Deck</li>
+                    <li>Paste the code in the "Authorization Code" field</li>
+                    <li>Click "Complete Authorization"</li>
+                </ol>
+            </div>
+        </div>
+
+        <div class="footer">
+            Stream Deck SmartThings Plugin • OAuth 2.0 with PKCE
+        </div>
+    </div>
+
+    <script>
+        function getUrlParameter(name) {
+            const urlParams = new URLSearchParams(window.location.search);
+            return urlParams.get(name);
+        }
+
+        function displayError(message) {
+            const errorContainer = document.getElementById('error-container');
+            errorContainer.innerHTML = `<div class="error">${message}</div>`;
+            document.getElementById('icon').textContent = '❌';
+            document.getElementById('title').textContent = 'Authorization Failed';
+            document.getElementById('subtitle').textContent = 'Please try again';
+        }
+
+        function displaySuccess(code) {
+            document.getElementById('success-container').style.display = 'block';
+            document.getElementById('code-display').textContent = code;
+
+            // Setup copy button
+            const copyBtn = document.getElementById('copy-btn');
+            copyBtn.addEventListener('click', () => {
+                navigator.clipboard.writeText(code).then(() => {
+                    copyBtn.textContent = '✓ Copied!';
+                    copyBtn.classList.add('copied');
+
+                    setTimeout(() => {
+                        copyBtn.textContent = '📋 Copy Code';
+                        copyBtn.classList.remove('copied');
+                    }, 2000);
+                }).catch(err => {
+                    alert('Failed to copy. Please select and copy manually.');
+                    console.error('Copy failed:', err);
+                });
+            });
+        }
+
+        // Parse URL parameters
+        const code = getUrlParameter('code');
+        const error = getUrlParameter('error');
+        const errorDescription = getUrlParameter('error_description');
+
+        if (error) {
+            displayError(errorDescription || error);
+        } else if (code) {
+            displaySuccess(code);
+        } else {
+            displayError('No authorization code received. Please try the authorization process again.');
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SmartThings OAuth - Stream Deck Plugin</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .container {
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            max-width: 600px;
+            width: 100%;
+            padding: 40px;
+            text-align: center;
+        }
+
+        .icon {
+            font-size: 64px;
+            margin-bottom: 20px;
+        }
+
+        h1 {
+            color: #2d3748;
+            font-size: 28px;
+            margin-bottom: 12px;
+        }
+
+        .subtitle {
+            color: #718096;
+            font-size: 16px;
+            margin-bottom: 32px;
+            line-height: 1.6;
+        }
+
+        .info-box {
+            background: #edf2f7;
+            border-radius: 8px;
+            padding: 24px;
+            text-align: left;
+            margin: 24px 0;
+        }
+
+        .info-box h3 {
+            color: #2d3748;
+            font-size: 16px;
+            margin-bottom: 12px;
+            font-weight: 600;
+        }
+
+        .info-box p {
+            color: #4a5568;
+            font-size: 14px;
+            line-height: 1.6;
+            margin-bottom: 12px;
+        }
+
+        .info-box ul {
+            padding-left: 20px;
+            color: #4a5568;
+            font-size: 14px;
+            line-height: 1.8;
+        }
+
+        .btn {
+            display: inline-block;
+            background: #667eea;
+            color: white;
+            text-decoration: none;
+            padding: 14px 32px;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            transition: all 0.2s;
+            margin: 10px;
+        }
+
+        .btn:hover {
+            background: #5568d3;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-secondary {
+            background: #48bb78;
+        }
+
+        .btn-secondary:hover {
+            background: #38a169;
+        }
+
+        .footer {
+            margin-top: 32px;
+            padding-top: 24px;
+            border-top: 1px solid #e2e8f0;
+            color: #a0aec0;
+            font-size: 13px;
+        }
+
+        .footer a {
+            color: #667eea;
+            text-decoration: none;
+        }
+
+        .footer a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="icon">🔐</div>
+        <h1>SmartThings OAuth Handler</h1>
+        <p class="subtitle">
+            This page handles OAuth2 authentication for the Stream Deck SmartThings plugin.
+            If you arrived here directly, there's nothing to do!
+        </p>
+
+        <div class="info-box">
+            <h3>🎮 For Stream Deck Users</h3>
+            <p>This page will automatically open when you authorize the SmartThings plugin. You'll see your authorization code here to copy back into Stream Deck.</p>
+            <p><strong>To get started:</strong></p>
+            <ul>
+                <li>Install the SmartThings plugin in Stream Deck</li>
+                <li>Add a SmartThings button to your Stream Deck</li>
+                <li>Click "Open Authorization Page"</li>
+                <li>Log in to SmartThings and authorize</li>
+                <li>You'll be redirected back here with your code</li>
+            </ul>
+        </div>
+
+        <div class="info-box">
+            <h3>👨‍💻 For Developers</h3>
+            <p>This is a simple static OAuth2 callback handler. It extracts the authorization code from the URL query parameters and displays it to the user.</p>
+            <p><strong>Callback URL:</strong> <code>/oauth-callback.html</code></p>
+        </div>
+
+        <div>
+            <a href="https://github.com/thibautsabot/streamdeck-plugin-smartthings" class="btn">📦 View Plugin on GitHub</a>
+            <a href="oauth-callback.html?code=demo123" class="btn btn-secondary">🧪 Test Callback Page</a>
+        </div>
+
+        <div class="footer">
+            Stream Deck SmartThings Plugin • OAuth 2.0 with PKCE<br>
+            Made by <a href="https://github.com/thibautsabot">Thibaut Sabot</a>
+        </div>
+    </div>
+</body>
+</html>

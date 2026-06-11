@@ -1,0 +1,6 @@
+{
+  "name": "streamdeck-smartthings-oauth-callback",
+  "version": "1.0.0",
+  "description": "OAuth2 callback handler for Stream Deck SmartThings plugin",
+  "private": false
+}

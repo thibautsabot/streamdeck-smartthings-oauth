@@ -4,7 +4,7 @@ This is a simple static page that handles the OAuth2 redirect callback for the S
 
 **Live Demo**: https://streamdeck-smartthings-oauth.vercel.app
 
-[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https://github.mpi-internal.com/thibaut-sabot/streamdeck-smartthings-oauth)
+[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https://github.com/thibautsabot/streamdeck-smartthings-oauth)
 
 
 ## How It Works
